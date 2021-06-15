@@ -52,9 +52,13 @@ namespace VSFlyWebAPI.Controllers
                 {
                     if (flight.FlightNo == booking.FlightNo)
                     {
+
+                        Passenger passenger = _context.PassengerSet.Find(booking.PassengerID);
+
                         PassengerModel passengerModel = new();
-                        passengerModel.FirstName = _context.PassengerSet.Find(booking.PassengerID).FirstName;
-                        passengerModel.LastName = _context.PassengerSet.Find(booking.PassengerID).LastName;
+                        passengerModel.FlightNo = flight.FlightNo;
+                        passengerModel.FirstName = passenger.FirstName;
+                        passengerModel.LastName = passenger.LastName;
                         passengerModel.PurchasePrice = booking.SalePrice;
                         flightWithPassengerModel.PassengerModelList.Add(passengerModel);
                     }
@@ -68,26 +72,28 @@ namespace VSFlyWebAPI.Controllers
         // POST: api/Bookings
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Booking>> PostBooking(Booking booking)
+        public async Task<ActionResult<PassengerModel>> PostBooking(PassengerModel passengerModel)
         {
-            _context.BookingSet.Add(booking);
-            try
+            if (passengerModel == null)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (BookingExists(booking.FlightNo))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound();
             }
 
-            return CreatedAtAction("GetBooking", new { id = booking.FlightNo }, booking);
+            var passenger = passengerModel.ConvertToPassenger();
+            _context.PassengerSet.Add(passenger);
+
+            await _context.SaveChangesAsync();
+           
+            int passengerIndex = await _context.PassengerSet.Where(passenger => passenger.FirstName.Equals(passengerModel.FirstName) &&
+                passenger.LastName.Equals(passengerModel.LastName))
+                .Select(passenger => passenger.PersonID).FirstAsync();
+
+            _context.BookingSet.Add(new Booking { FlightNo = passengerModel.FlightNo, PassengerID = passengerIndex, 
+                SalePrice =  passengerModel.PurchasePrice });
+            await _context.SaveChangesAsync();
+
+            return StatusCode(200);
+
         }
 
         private bool BookingExists(int id)

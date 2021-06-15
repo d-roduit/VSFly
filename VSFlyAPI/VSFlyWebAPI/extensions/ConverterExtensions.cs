@@ -28,7 +28,7 @@ namespace VSFlyWebAPI.Controllers.extensions
 
             double seatsBooked = _context.BookingSet.Where(booking => booking.FlightNo == flight.FlightNo).Count();
             double planeCapacity = (double)flight.Seats;
-            double flightFullness = seatsBooked / (planeCapacity * 100);
+            double flightFullness = (seatsBooked / planeCapacity )* 100;
             double modifier = 1;
 
             int delta = (flight.Date - DateTime.Now).Days;

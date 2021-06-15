@@ -70,7 +70,7 @@ namespace VSFlyWebAPI.Controllers
             return finalSale;
         }
 
-        // GET: api/Flights/AvgSaleForDestination/{destination}
+        // GET: api/Flights/Destination/{destination}
         // return average purchase price of destination's bookings
         [HttpGet]
         [Route("Destination/{destination}")]
