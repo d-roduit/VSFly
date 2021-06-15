@@ -42,54 +42,80 @@ namespace EFCoreApp2021
             //Creating flight objects
             var newFlight = new Flight
             {
-                Departure = "GVA",
-                Destination = "CDG",
+                Departure = "Geneva",
+                Destination = "Paris",
                 Date = DateTime.Parse("20/07/2021 08:35"),
                 Seats = 10,
                 BasePrice = 150,
                 PilotId = p.PersonID
             };
             ctx.Add(newFlight);
+            ctx.SaveChanges();
             var newFlight2 = new Flight
             {
-                Departure = "CDG",
-                Destination = "ZRH",
+                Departure = "Paris",
+                Destination = "Zurich",
                 Date = DateTime.Parse("22/07/2021 17:40"),
                 Seats = 10,
                 BasePrice = 180,
                 PilotId = p.PersonID
             };
             ctx.Add(newFlight2);
+            ctx.SaveChanges();
             var newFlight3 = new Flight
             {
-                Departure = "LGW",
-                Destination = "BSL",
+                Departure = "London",
+                Destination = "Basel",
                 Date = DateTime.Parse("23/07/2021 18:40"),
                 Seats = 10,
                 BasePrice = 90,
                 PilotId = p1.PersonID
             };
             ctx.Add(newFlight3);
+            ctx.SaveChanges();
             var newFlight4 = new Flight
             {
-                Departure = "MAD",
-                Destination = "GVA",
+                Departure = "Madrid",
+                Destination = "Geneva",
                 Date = DateTime.Parse("28/07/2021 09:55"),
                 Seats = 10,
                 BasePrice = 75,
                 PilotId = p2.PersonID
             };
             ctx.Add(newFlight4);
+            ctx.SaveChanges();
             var newFlight5 = new Flight
             {
-                Departure = "GVA",
-                Destination = "CDG",
+                Departure = "Geneva",
+                Destination = "Paris",
                 Date = DateTime.Parse("22/02/2021 10:40"),
                 Seats = 10,
                 BasePrice = 200,
                 PilotId = p2.PersonID
             };
             ctx.Add(newFlight5);
+            ctx.SaveChanges();
+            #endregion
+
+            #region Test Passengers
+            // Creating passenger objects
+            Passenger passengerTest1 = new Passenger { FirstName = "Wess", LastName = "Gibbins" };
+            Passenger passengerTest2 = new Passenger { FirstName = "Michaela", LastName = "Pratt" };
+            Passenger passengerTest3 = new Passenger { FirstName = "Laurel", LastName = "Castillo" };
+
+            ctx.PassengerSet.Add(passengerTest1);
+            ctx.PassengerSet.Add(passengerTest2);
+            ctx.PassengerSet.Add(passengerTest3);
+            ctx.SaveChanges();
+            #endregion
+
+            #region Bookings
+
+            ctx.BookingSet.Add(new Booking { Flight = ctx.FlightSet.Find(1), PassengerID = 1, SalePrice = 60});
+            ctx.BookingSet.Add(new Booking { Flight = ctx.FlightSet.Find(1), PassengerID = 2, SalePrice = 140 });
+            ctx.BookingSet.Add(new Booking { Flight = ctx.FlightSet.Find(2), PassengerID = 3, SalePrice = 100});
+            ctx.SaveChanges();
+
             #endregion
 
             #region Selection of all flights
