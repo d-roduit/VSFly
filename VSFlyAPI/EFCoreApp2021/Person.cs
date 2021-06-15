@@ -13,6 +13,5 @@ namespace EFCoreApp2021
         public int PersonID { get; set; }
         public String FirstName { get; set; }
         public String LastName { get; set; }
-
     }
 }

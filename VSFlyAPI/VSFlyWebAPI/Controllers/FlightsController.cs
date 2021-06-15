@@ -22,20 +22,23 @@ namespace VSFlyWebAPI.Controllers
             _context = context;
         }
 
-        // GET: api/Flights
+        // GET: api/Flights/Available
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<FlightModel>>> GetFlightSet()
+        [Route("Available")]
+        public async Task<ActionResult<IEnumerable<FlightModel>>> GetAvailableFlights()
         {
-            var flightList = await _context.FlightSet.ToListAsync();
-            List<Models.FlightModel> listFlightM = new List<FlightModel>();
+            var flightList = await _context.FlightSet.Where(flight => flight.Date >= DateTime.Now).ToListAsync();
+            List<FlightModel> flightModelList = new List<FlightModel>();
 
-            foreach (Flight f in flightList)
+            foreach (Flight flight in flightList)
             {
-                var fm = f.ConverterToFlightM();
-                listFlightM.Add(fm);
+                if (!IsFlightFull(flight))
+                {
+                    flightModelList.Add(flight.ConvertToFlightModel(_context));
+                }
             }
 
-            return listFlightM;
+            return flightModelList;
         }
 
         // GET: api/Flights/5
@@ -88,7 +91,7 @@ namespace VSFlyWebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Flight>> PostFlight(FlightModel flight)
         {
-            _context.FlightSet.Add(flight.ConvertToFlightEF());
+            _context.FlightSet.Add(flight.ConvertToFlight());
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetFlight", new { id = flight.FlightNo }, flight);
@@ -110,9 +113,21 @@ namespace VSFlyWebAPI.Controllers
             return NoContent();
         }
 
-        private bool FlightExists(int id)
+        private bool FlightExists(int flightNo)
         {
-            return _context.FlightSet.Any(e => e.FlightNo == id);
+            return _context.FlightSet.Any(flight => flight.FlightNo == flightNo);
+        }
+
+        private bool IsFlightFull(Flight flight)
+        {
+            if (!FlightExists(flight.FlightNo))
+            {
+                throw new ArgumentException("No flight exists for flightNo " + flight.FlightNo);
+            }
+
+            int seatsBooked = _context.BookingSet.Where(booking => booking.FlightNo == flight.FlightNo).Count();
+
+            return seatsBooked >= flight.Seats;
         }
     }
 }
