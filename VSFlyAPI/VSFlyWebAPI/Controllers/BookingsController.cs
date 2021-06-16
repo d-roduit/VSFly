@@ -64,7 +64,7 @@ namespace VSFlyWebAPI.Controllers
         // GET: api/Bookings/<flightNo>/SalePrice
         // Return the total sale price of all tickets sold for a flight
         [HttpGet]
-        [Route("Bookings/{flightNo}/SalePrice")]
+        [Route("{flightNo}/SalePrice")]
         public async Task<ActionResult<double>> GetFlightTotalSalePrice(int flightNo)
         {
             var flightTotalSalePrice = await _context.BookingSet.Where(booking => booking.FlightNo == flightNo)

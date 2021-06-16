@@ -35,12 +35,12 @@ namespace VSFlyWebAPI.Controllers.extensions
                 
             if (flightFullness < 20 && delta < 60 ) 
             {
-                modifier = 0.7;
+                modifier = 0.8;
             }
                 
             if (flightFullness < 50 && delta < 30 )
             {
-                modifier = 0.8;
+                modifier = 0.7;
             }
 
             if (flightFullness > 80)

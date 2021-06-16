@@ -1,8 +1,83 @@
-﻿@{
+﻿@model IEnumerable<VSFlyWebsite.Models.FlightModel>
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Our available flights</h1>
-    <button class="btn-primary">Refresh</button>
+<div>
+    <h1 class="display-4 text-center">Currently available flights</h1>
+    @if (TempData["isPostSuccess"] != null)
+    {
+        if ((bool)TempData["isPostSuccess"])
+        {
+            <div class="alert alert-success" role="alert">Booking successfull !</div>
+        } else
+        {
+            <div class="alert alert-danger" role="alert">We encountered an error during booking. Please retry.</div>
+        }
+    }
+    <div class="container mt-5">
+        <table class="table table-bordered table-striped table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Departure</th>
+                    <th scope="col">Destination</th>
+                    <th scope="col">Price</th>
+                    <th scope="col"></th> 
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (FlightModel modelItem in Model) { 
+                <tr>
+                    <td class="align-middle">@modelItem.Date</td>
+                    <td class="align-middle">@modelItem.Departure</td>
+                    <td class="align-middle">@modelItem.Destination</td>
+                    <td class="align-middle">@modelItem.SalePrice</td>
+                    <td class="align-middle">
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-book-@(modelItem.FlightNo)">Book</button>
+                        <div class="modal fade" tabindex="-1" id="modal-book-@(modelItem.FlightNo)" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Booking</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <h4 class="mb-3">Summary</h4>
+                                        <p class="mb-0">Flight Number : @modelItem.FlightNo</p>
+                                        <p class="mb-0">Date : @modelItem.Date</p>
+                                        <p class="mb-0">Departure : @modelItem.Departure</p>
+                                        <p class="mb-0">Destination : @modelItem.Destination</p>
+                                        <p class="mb-0">Price : @modelItem.SalePrice CHF</p>
+
+                                        <h4 class="mt-3 mb-3">Customer information</h4>
+                                        <form asp-controller="Home" asp-action="Index" method="POST" id="modal-book-@(modelItem.FlightNo)-form">
+                                            <input class="d-none" type="hidden" name="flightNo" value="@(modelItem.FlightNo)" />
+                                            <input class="d-none" type="hidden" name="PurchasePrice" value="@(modelItem.SalePrice)" />
+
+                                            <div class="mb-3">
+                                                <label for="firstnameInput" class="form-label">Firstname</label>
+                                                <input type="text" class="form-control" id="firstnameInput" name="Firstname">
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="lastnameInput" class="form-label">Lastname</label>
+                                                <input type="text" class="form-control" id="lastnameInput" name="Lastname">
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-primary" form="modal-book-@(modelItem.FlightNo)-form">Confirm booking</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>

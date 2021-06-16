@@ -1,7 +1,151 @@
-﻿@{
+﻿@model VSFlyWebsite.ViewModels.Statistics.StatisticsViewModel;
+
+@{
     ViewData["Title"] = "Statistics";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Discover useful information on the flights</h1>
+<div>
+    <h1 class="display-4 text-center">Discover useful information on the flights</h1>
+
+    <div class="container">
+        <h3 class="mt-5">Flight information</h3>
+
+        <form asp-controller="Statistics" asp-action="Flights" method="GET">
+            <div class="form-inline">
+                <input type="number" id="flightNoInput" name="flightNo" placeholder="Flight No">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </form>
+
+        @if (TempData["noFlightOrSalePrice"] != null)
+        {
+            if ((bool)TempData["noFlightOrSalePrice"])
+            {
+                <div class="alert alert-warning">No flight found for the given flight number.</div>
+            }
+        }
+
+        @if (Model != null && Model.FlightModel != null)
+        {
+            <table class="table table-bordered table-striped table-hover mt-3">
+                <thead>
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Departure</th>
+                        <th scope="col">Destination</th>
+                        <th scope="col">Sum Sale Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="align-middle">@Model.FlightModel.Date</td>
+                        <td class="align-middle">@Model.FlightModel.Departure</td>
+                        <td class="align-middle">@Model.FlightModel.Destination</td>
+                        <td class="align-middle">@Model.TotalFlightSalePrice</td>
+                    </tr>
+                </tbody>
+            </table>
+        }
+
+
+        <h3 class="mt-5">Destination information</h3>
+
+        <form asp-controller="Statistics" asp-action="Destination" method="GET">
+            <div class="form-inline">
+                <input type="text" id="destinationInput" name="destination" placeholder="Destination">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </form>
+
+        @if (TempData["noDestination"] != null)
+        {
+            if ((bool)TempData["noDestination"])
+            {
+                <div class="alert alert-warning">No destination information found for the given destination.</div>
+            }
+        }
+
+        @if (Model != null && Model.FlightWithPassengerModelList != null && Model.FlightWithPassengerModelList.Count > 0)
+        {
+            <table class="table table-bordered table-striped table-hover mt-3">
+                <thead>
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Departure</th>
+                        <th scope="col">Destination</th>
+                        <th scope="col"></th>  
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (FlightWithPassengerModel flightWithPassengerModel in Model.FlightWithPassengerModelList)
+                    {
+                        <tr>
+                            <td class="align-middle">@flightWithPassengerModel.FlightModel.Date</td>
+                            <td class="align-middle">@flightWithPassengerModel.FlightModel.Departure</td>
+                            <td class="align-middle">@flightWithPassengerModel.FlightModel.Destination</td>
+                            <td class="align-middle">
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-flight-@(flightWithPassengerModel.FlightModel.FlightNo)">+</button>
+
+                                <div class="modal fade" tabindex="-1" id="modal-flight-@(flightWithPassengerModel.FlightModel.FlightNo)" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Flight No @flightWithPassengerModel.FlightModel.FlightNo</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                @if (flightWithPassengerModel.PassengerModelList != null && flightWithPassengerModel.PassengerModelList.Count > 0)
+                                                {
+                                                    <table class="table table-bordered table-striped table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col">Firstname</th>
+                                                                <th scope="col">Lastname</th>
+                                                                <th scope="col">Purchase Price</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach (PassengerModel passengerModel in flightWithPassengerModel.PassengerModelList)
+                                                            {
+                                                                <tr>
+                                                                    <td class="align-middle">@passengerModel.FirstName</td>
+                                                                    <td class="align-middle">@passengerModel.LastName</td>
+                                                                    <td class="align-middle">@passengerModel.PurchasePrice CHF</td>
+                                                                </tr>
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                }
+                                                else
+                                                {
+                                                    <p>No passenger for this flight :(</p>
+                                                }
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        @if (TempData["noAveragePrice"] != null && TempData["noDestination"] == null)
+        {
+            if ((bool)TempData["noAveragePrice"])
+            {
+               <div class="alert alert-warning">No average price because nobody wants to go there ! :(</div>
+            }
+        } else
+        {
+            if (Model != null && Model.FlightWithPassengerModelList != null)
+            {
+                <p>Average Price: @Model.AverageDestinationSalePrice CHF</p>
+            }
+        }
+    </div>
 </div>

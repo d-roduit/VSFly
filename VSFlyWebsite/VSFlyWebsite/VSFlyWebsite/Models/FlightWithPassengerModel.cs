@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace VSFlyWebsite.Models
 {
-    public class BookingModel
+    public class FlightWithPassengerModel
     {
         public FlightModel FlightModel { get; set; }
         public List<PassengerModel> PassengerModelList { get; set; }
