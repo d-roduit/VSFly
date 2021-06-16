@@ -30,12 +30,53 @@ namespace VSFlyWebAPI.Controllers
             return await _context.BookingSet.ToListAsync();
         }
 
-        
+        // POST: api/Bookings
+        // To create a passenger in the database
+        [HttpPost]
+        public async Task<ActionResult<PassengerModel>> PostBooking(PassengerModel passengerModel)
+        {
+            if (passengerModel == null)
+            {
+                return NotFound();
+            }
 
+            var passenger = passengerModel.ConvertToPassenger();
+            _context.PassengerSet.Add(passenger);
 
-        // GET: api/Bookings
+            await _context.SaveChangesAsync();
+
+            int passengerIndex = await _context.PassengerSet.Where(passenger => passenger.FirstName.Equals(passengerModel.FirstName) &&
+                passenger.LastName.Equals(passengerModel.LastName))
+                .Select(passenger => passenger.PersonID).FirstAsync();
+
+            _context.BookingSet.Add(new Booking
+            {
+                FlightNo = passengerModel.FlightNo,
+                PassengerID = passengerIndex,
+                SalePrice = passengerModel.PurchasePrice
+            });
+            await _context.SaveChangesAsync();
+
+            return StatusCode(200);
+
+        }
+
+        // GET: api/Bookings/<flightNo>/SalePrice
+        // Return the total sale price of all tickets sold for a flight
         [HttpGet]
-        [Route("{destination}")]
+        [Route("Bookings/{flightNo}/SalePrice")]
+        public async Task<ActionResult<double>> GetFlightTotalSalePrice(int flightNo)
+        {
+            var flightTotalSalePrice = await _context.BookingSet.Where(booking => booking.FlightNo == flightNo)
+                 .Select(booking => booking.SalePrice).SumAsync();
+
+            return flightTotalSalePrice;
+        }
+
+        // GET: api/Bookings/Destination/{destination}
+        // return all the tickets purchased for a destination with the passengers information
+        [HttpGet]
+        [Route("Destination/{destination}")]
         public async Task<ActionResult<IEnumerable<FlightWithPassengerModel>>> GetAllTicketSoldForDestination(string destination)
         {
             var destinationFlightList = await _context.FlightSet.Where(flight => flight.Destination.Equals(destination)).ToListAsync();
@@ -62,43 +103,25 @@ namespace VSFlyWebAPI.Controllers
                         passengerModel.PurchasePrice = booking.SalePrice;
                         flightWithPassengerModel.PassengerModelList.Add(passengerModel);
                     }
-                    
+
                 }
                 flightWithPassengerModelList.Add(flightWithPassengerModel);
             }
             return flightWithPassengerModelList;
         }
 
-        // POST: api/Bookings
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<PassengerModel>> PostBooking(PassengerModel passengerModel)
+        // GET: api/Bookings/Destination/{destination}/AveragePrice
+        // return average purchase price of destination's bookings
+        [HttpGet]
+        [Route("Destination/{destination}/AveragePrice")]
+        public async Task<ActionResult<double>> AverageBookingPriceForDestination(string destination)
         {
-            if (passengerModel == null)
-            {
-                return NotFound();
-            }
+            var destinationPriceList = await _context.BookingSet.Where(booking => booking.Flight.Destination.Equals(destination))
+                .Select(booking => booking.SalePrice).ToListAsync();
 
-            var passenger = passengerModel.ConvertToPassenger();
-            _context.PassengerSet.Add(passenger);
+            double averageSale = destinationPriceList.Average();
 
-            await _context.SaveChangesAsync();
-           
-            int passengerIndex = await _context.PassengerSet.Where(passenger => passenger.FirstName.Equals(passengerModel.FirstName) &&
-                passenger.LastName.Equals(passengerModel.LastName))
-                .Select(passenger => passenger.PersonID).FirstAsync();
-
-            _context.BookingSet.Add(new Booking { FlightNo = passengerModel.FlightNo, PassengerID = passengerIndex, 
-                SalePrice =  passengerModel.PurchasePrice });
-            await _context.SaveChangesAsync();
-
-            return StatusCode(200);
-
-        }
-
-        private bool BookingExists(int id)
-        {
-            return _context.BookingSet.Any(e => e.FlightNo == id);
+            return Math.Round(averageSale, 2);
         }
     }
 }

@@ -43,7 +43,7 @@ namespace VSFlyWebAPI.Controllers
 
         // GET: api/Flights/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Flight>> GetFlight(int id)
+        public async Task<ActionResult<FlightModel>> GetFlight(int id)
         {
             var flight = await _context.FlightSet.FindAsync(id);
 
@@ -52,47 +52,17 @@ namespace VSFlyWebAPI.Controllers
                 return NotFound();
             }
 
-            return flight;
+            return flight.ConvertToFlightModel(_context);
         }
 
-        // GET: api/Flights/TotalSalesForFlight/{id} return total purchase price of flight' bookings
+        // GET: api/Flights/{id}/SalePrice
+        // Return the SalePrice for a specific flight
         [HttpGet("{id}/SalePrice")]
-        public async Task<ActionResult<double>> TotalSalesForFlight(int id)
+        public async Task<ActionResult<double>> SalePriceForFlight(int id)
         {
             Flight flight = await _context.FlightSet.FindAsync(id);
-            double finalSale = 0.0;
 
-            foreach (Booking booking in _context.BookingSet)
-            {
-                if(booking.FlightNo == id)
-                finalSale += booking.SalePrice;
-            }
-            return finalSale;
-        }
-
-        // GET: api/Flights/Destination/{destination}
-        // return average purchase price of destination's bookings
-        [HttpGet]
-        [Route("Destination/{destination}")]
-        public async Task<ActionResult<double>> AverageFlightSaleForDestination(string destination)
-        {
-            var destinationPriceList = await _context.BookingSet.Where(booking => booking.Flight.Destination.Equals(destination))
-                .Select(booking => booking.SalePrice).ToListAsync();
-
-            double averageSale = destinationPriceList.Average();
-
-            return Math.Round(averageSale, 2, MidpointRounding.ToEven);
-        }
-
-        // POST: api/Flights
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Flight>> PostFlight(FlightModel flight)
-        {
-            _context.FlightSet.Add(flight.ConvertToFlight());
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetFlight", new { id = flight.FlightNo }, flight);
+            return flight.ConvertToFlightModel(_context).SalePrice;
         }
 
         private bool FlightExists(int flightNo)
@@ -110,11 +80,6 @@ namespace VSFlyWebAPI.Controllers
             int seatsBooked = _context.BookingSet.Where(booking => booking.FlightNo == flight.FlightNo).Count();
 
             return seatsBooked >= flight.Seats;
-        }
-
-        private double NumberOfPassengerOnPlane(Flight flight)
-        {
-           return _context.BookingSet.Where(booking => booking.FlightNo == flight.FlightNo).Count();
         }
     }
 }

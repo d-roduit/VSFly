@@ -45,7 +45,7 @@ namespace EFCoreApp2021
                 Departure = "Geneva",
                 Destination = "Paris",
                 Date = DateTime.Parse("20/07/2021 08:35"),
-                Seats = 10,
+                Seats = 6,
                 BasePrice = 150,
                 PilotId = p.PersonID
             };
@@ -67,7 +67,7 @@ namespace EFCoreApp2021
                 Departure = "London",
                 Destination = "Basel",
                 Date = DateTime.Parse("23/07/2021 18:40"),
-                Seats = 10,
+                Seats = 6,
                 BasePrice = 90,
                 PilotId = p1.PersonID
             };
@@ -75,8 +75,8 @@ namespace EFCoreApp2021
             ctx.SaveChanges();
             var newFlight4 = new Flight
             {
-                Departure = "Madrid",
-                Destination = "Geneva",
+                Departure = "London",
+                Destination = "Basel",
                 Date = DateTime.Parse("28/07/2021 09:55"),
                 Seats = 10,
                 BasePrice = 75,
@@ -88,34 +88,13 @@ namespace EFCoreApp2021
             {
                 Departure = "Geneva",
                 Destination = "Paris",
-                Date = DateTime.Parse("22/02/2021 10:40"),
+                Date = DateTime.Parse("22/09/2021 10:40"),
                 Seats = 10,
                 BasePrice = 200,
                 PilotId = p2.PersonID
             };
             ctx.Add(newFlight5);
             ctx.SaveChanges();
-            #endregion
-
-            #region Test Passengers
-            // Creating passenger objects
-            Passenger passengerTest1 = new Passenger { FirstName = "Wess", LastName = "Gibbins" };
-            Passenger passengerTest2 = new Passenger { FirstName = "Michaela", LastName = "Pratt" };
-            Passenger passengerTest3 = new Passenger { FirstName = "Laurel", LastName = "Castillo" };
-
-            ctx.PassengerSet.Add(passengerTest1);
-            ctx.PassengerSet.Add(passengerTest2);
-            ctx.PassengerSet.Add(passengerTest3);
-            ctx.SaveChanges();
-            #endregion
-
-            #region Bookings
-
-            ctx.BookingSet.Add(new Booking { Flight = ctx.FlightSet.Find(1), PassengerID = 1, SalePrice = 60});
-            ctx.BookingSet.Add(new Booking { Flight = ctx.FlightSet.Find(1), PassengerID = 2, SalePrice = 140 });
-            ctx.BookingSet.Add(new Booking { Flight = ctx.FlightSet.Find(2), PassengerID = 3, SalePrice = 100});
-            ctx.SaveChanges();
-
             #endregion
 
             #region Selection of all flights
@@ -169,7 +148,7 @@ namespace EFCoreApp2021
 
             if (updateFlight != null)
             {
-                updateFlight.Seats = 1;
+                updateFlight.Seats = 6;
             }
             ctx.SaveChanges();
 
@@ -204,6 +183,8 @@ namespace EFCoreApp2021
                 Console.WriteLine("Date: {0} Departure: {1} Destination: {2} Seats: {3}", flight.Date, flight.Departure, flight.Destination, flight.Seats);
             }
             #endregion
+
+            #region Display
 
             //Select Flights and pilots and display them 
             Console.WriteLine();
@@ -302,6 +283,7 @@ namespace EFCoreApp2021
                     Console.WriteLine("{0} {1} {2}", book.Flight.Date, book.Flight.Departure, book.Flight.Pilot.FirstName);
                 }
             }
+            #endregion
 
             Console.ReadKey();
         }
