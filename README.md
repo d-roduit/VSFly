@@ -70,30 +70,30 @@ The sample data stored the first time you launch the `EFCoreApp2021` project onl
 
 ### Bookings
 
-- GET /api/Bookings
+- **GET** `/api/Bookings`
 > Return all bookings.
 
-- POST /api/Bookings
+- **POST** `/api/Bookings`
 > Add a new entry into BookingSet.
 
-- GET /api/Bookings/{flightNo}/SalePrice
+- **GET** `/api/Bookings/{flightNo}/SalePrice`
 > Return the sum of all booking prices paid for a given flight.
 
-- GET /api/Bookings/Destination/{destination}
+- **GET** `/api/Bookings/Destination/{destination}`
 > Return all the booking information about a given destination.
 
-- GET /api/Bookings/Destination/{destination}/AveragePrice
+- **GET** `/api/Bookings/Destination/{destination}/AveragePrice`
 > Return the average price paid for a given destination.
 
 ### Flights
 
-- GET /api/Flights/Available
+- **GET** `/api/Flights/Available`
 > Return the available flights (= the bookable flights)
 
-- GET /api/Flights/{id}
+- **GET** `/api/Flights/{id}`
 > Return the flight for the given flight id.
 
-- GET /api/Flights/{id}/SalePrice
+- **GET** `/api/Flights/{id}/SalePrice`
 > Return the booking price of the flight for the given flight id.
 
 ## <a name="authors"></a>Authors
