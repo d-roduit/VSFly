@@ -12,6 +12,8 @@
 <div align="center">
     <a href="https://github.com/d-roduit/VSFly">
         <img src="demo_screenshots/flights_results.jpg" align="center" width="80%" alt="Demo flights results screenshot">
+       <br/>
+       <br/>
         <img src="demo_screenshots/statistics.jpg" align="center" width="80%" alt="Demo statistics screenshot">
     </a>
 </div>
